@@ -1,3 +1,5 @@
+node_modules/
 .env
-/node_modules/*
-/output
+.worktrees/
+_bmad-output/stories/
+*.log
