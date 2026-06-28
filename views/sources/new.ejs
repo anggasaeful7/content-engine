@@ -1,0 +1,52 @@
+<div class="max-w-lg mx-auto">
+  <h1>New Scrape</h1>
+
+  <div class="card mt-6">
+    <div class="card-body">
+      <form onsubmit="event.preventDefault();triggerScrape()">
+        <div class="form-group">
+          <label class="form-label">Platforms</label>
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer">
+            <input type="checkbox" name="platforms" value="tiktok" checked class="checkbox"> TikTok
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer">
+            <input type="checkbox" name="platforms" value="instagram" class="checkbox"> Instagram
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer">
+            <input type="checkbox" name="platforms" value="youtube" class="checkbox"> YouTube
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Target Hashtags</label>
+          <div class="flex flex-wrap gap-2 mb-3" id="hashtag-list" hx-get="/api/tags" hx-trigger="load" hx-swap="innerHTML">
+            <span class="text-subtle text-sm">Loading...</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="new-tag" class="input" placeholder="Add hashtag..." style="flex:1">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addHashtag()">+ Add</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full mt-4">Start Scrape</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+async function addHashtag() {
+  const input = document.getElementById('new-tag');
+  const tag = input.value.trim();
+  if (!tag) return;
+  const res = await fetch('/api/tags', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tag})
+  });
+  if (res.ok) { input.value = ''; htmx.trigger('#hashtag-list','load'); }
+}
+
+async function toggleHashtag(id) {
+  await fetch(`/api/tags/${id}/toggle`, {method:'PATCH'});
+  htmx.trigger('#hashtag-list','load');
+}
+</script>

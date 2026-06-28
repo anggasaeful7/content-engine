@@ -1,0 +1,14 @@
+<div class="flex items-center justify-between mb-6">
+  <h1>Contents</h1>
+</div>
+
+<div class="table-wrap">
+  <table hx-get="/api/contents" hx-trigger="load, every 15s" hx-swap="innerHTML">
+    <thead>
+      <tr><th>Title</th><th>Type</th><th>Platform</th><th>Status</th><th>Score</th><th>Created</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="7" class="text-center py-8"><div class="spinner"></div></td></tr>
+    </tbody>
+  </table>
+</div>

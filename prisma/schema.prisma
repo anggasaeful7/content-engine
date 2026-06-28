@@ -1,0 +1,170 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Source {
+  id             Int            @id @default(autoincrement())
+  platform       String         @db.VarChar(20)
+  hashtags       Json
+  rawItemsCount  Int            @default(0)
+  rawData        Json?
+  status         String         @default("pending") @db.VarChar(20)
+  errorLog       String?        @db.Text
+  createdAt      DateTime       @default(now()) @map("created_at")
+  ideas          ContentIdea[]
+  contents       Content[]
+  pipelineRuns   PipelineRun[]
+
+  @@map("sources")
+}
+
+model ContentIdea {
+  id                Int       @id @default(autoincrement())
+  sourceId          Int       @map("source_id")
+  title             String    @db.VarChar(300)
+  contentType       String    @default("short") @map("content_type") @db.VarChar(10)
+  targetPlatform    String    @default("tiktok") @map("target_platform") @db.VarChar(20)
+  hook              String?   @db.Text
+  deepseekReasoning String?   @map("deepseek_reasoning") @db.Text
+  referenceData     Json?     @map("reference_data")
+  qualityScore      Int       @default(0) @map("quality_score")
+  seoKeywords       Json?     @map("seo_keywords")
+  status            String    @default("pending") @db.VarChar(20)
+  approvedAt        DateTime? @map("approved_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  source            Source    @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  contents          Content[]
+
+  @@map("content_ideas")
+}
+
+model Content {
+  id                  Int       @id @default(autoincrement())
+  ideaId              Int       @map("idea_id")
+  sourceId            Int       @map("source_id")
+  title               String    @db.VarChar(300)
+  contentType         String    @default("short") @map("content_type") @db.VarChar(10)
+  targetPlatform      String    @default("tiktok") @map("target_platform") @db.VarChar(20)
+  status              String    @default("draft") @db.VarChar(20)
+  contentDescription  String?   @map("content_description") @db.Text
+  script              String?   @db.Text
+  storyboard          Json?
+  transcript          String?   @db.Text
+  assetDescriptions   Json?     @map("asset_descriptions")
+  hook                String?   @db.Text
+  callToAction        String?   @map("call_to_action") @db.Text
+  durationEstimate    Int?      @map("duration_estimate")
+  hashtags            Json?
+  qualityScore        Int       @default(0) @map("quality_score")
+  publishedUrl        String?   @map("published_url") @db.VarChar(500)
+  publishedAt         DateTime? @map("published_at")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  idea                ContentIdea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  source              Source    @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  analytics           ContentAnalytic[]
+  adaptations         ContentAdaptation[]
+
+  @@map("contents")
+}
+
+model ContentAnalytic {
+  id             Int       @id @default(autoincrement())
+  contentId      Int       @map("content_id")
+  platform       String    @db.VarChar(20)
+  views          Int       @default(0)
+  likes          Int       @default(0)
+  comments       Int       @default(0)
+  shares         Int       @default(0)
+  saves          Int       @default(0)
+  engagementRate Decimal?  @map("engagement_rate") @db.Decimal(5, 2)
+  recordedAt     DateTime  @default(now()) @map("recorded_at")
+  content        Content   @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@map("content_analytics")
+}
+
+model PipelineRun {
+  id              Int       @id @default(autoincrement())
+  runType         String    @map("run_type") @db.VarChar(30)
+  status          String    @default("queued") @db.VarChar(20)
+  platforms       Json?
+  sourceId        Int?      @map("source_id")
+  itemsProcessed  Int       @default(0) @map("items_processed")
+  errorLog        String?   @map("error_log") @db.Text
+  startedAt       DateTime  @default(now()) @map("started_at")
+  completedAt     DateTime? @map("completed_at")
+  source          Source?   @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@map("pipeline_runs")
+}
+
+model ContentAdaptation {
+  id           Int      @id @default(autoincrement())
+  contentId    Int      @map("content_id")
+  platform     String   @db.VarChar(20)
+  adaptedTitle String?  @map("adapted_title") @db.VarChar(300)
+  content      String?  @db.Text
+  format       String?  @db.VarChar(20)
+  createdAt    DateTime @default(now()) @map("created_at")
+  contentRel   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@map("content_adaptations")
+}
+
+model Competitor {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(200)
+  platform    String   @db.VarChar(20)
+  handle      String   @db.VarChar(200)
+  profileUrl  String?  @map("profile_url") @db.VarChar(500)
+  notes       String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  analyses    CompetitorAnalysis[]
+
+  @@map("competitors")
+}
+
+model CompetitorAnalysis {
+  id            Int      @id @default(autoincrement())
+  competitorId  Int      @map("competitor_id")
+  totalPosts    Int      @default(0) @map("total_posts")
+  avgViews      Int      @default(0) @map("avg_views")
+  avgEngagement Decimal? @map("avg_engagement") @db.Decimal(5, 2)
+  topHashtags   Json?
+  topFormats    Json?
+  insights      String?  @db.Text
+  scrapedAt     DateTime @default(now()) @map("scraped_at")
+  competitor    Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+
+  @@map("competitor_analyses")
+}
+
+model TrendingTopic {
+  id          Int      @id @default(autoincrement())
+  keyword     String   @db.VarChar(100)
+  platform    String   @db.VarChar(20)
+  mentionCount Int     @default(0) @map("mention_count")
+  velocity    Decimal? @db.Decimal(10, 2)
+  trendScore  Int      @default(0) @map("trend_score")
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+
+  @@index([platform, recordedAt])
+  @@map("trending_topics")
+}
+
+model Hashtag {
+  id        Int      @id @default(autoincrement())
+  tag       String   @unique @db.VarChar(100)
+  platform  String   @default("all") @db.VarChar(20)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("hashtags")
+}

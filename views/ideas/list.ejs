@@ -1,0 +1,43 @@
+<div class="flex items-center justify-between mb-4">
+  <h1>Content Ideas</h1>
+  <button id="bulk-approve-btn" class="btn btn-success" onclick="bulkApprove()" disabled>Approve (0)</button>
+</div>
+
+<div class="flex gap-3 mb-4 flex-wrap">
+  <select class="select" style="width:auto" onchange="document.getElementById('f-status').value=this.value;htmx.trigger('#ideas-table','reload')">
+    <option value="">All Status</option>
+    <option value="pending">Pending</option>
+    <option value="approved">Approved</option>
+    <option value="rejected">Rejected</option>
+  </select>
+  <select class="select" style="width:auto" onchange="document.getElementById('f-type').value=this.value;htmx.trigger('#ideas-table','reload')">
+    <option value="">All Types</option>
+    <option value="short">Short-form</option>
+    <option value="long">Long-form</option>
+  </select>
+  <input type="hidden" id="f-status" value="">
+  <input type="hidden" id="f-type" value="">
+</div>
+
+<div class="table-wrap">
+  <table id="ideas-table"
+    hx-get="/api/ideas?sourceId=<%= sourceId || '' %>"
+    hx-trigger="load, reload"
+    hx-swap="innerHTML"
+    hx-vals="js:{status:document.getElementById('f-status')?.value||'',type:document.getElementById('f-type')?.value||''}">
+    <thead>
+      <tr>
+        <th style="width:40px"><input type="checkbox" class="checkbox" onchange="toggleSelectAll(this.checked)"></th>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Platform</th>
+        <th>Score</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="7" class="text-center py-8"><div class="spinner"></div></td></tr>
+    </tbody>
+  </table>
+</div>

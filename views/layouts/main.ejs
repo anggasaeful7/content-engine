@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — Angscode</title>
+  <link rel="stylesheet" href="/css/design-system.css">
+  <script src="https://unpkg.com/htmx.org@2"></script>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      🚀 Angscode
+      <span class="version">v2</span>
+    </a>
+    <ul class="navbar-links">
+      <li><a href="/" class="<%= active === 'dashboard' ? 'active' : '' %>">Dashboard</a></li>
+      <li><a href="/sources" class="<%= active === 'sources' ? 'active' : '' %>">Sources</a></li>
+      <li><a href="/ideas" class="<%= active === 'ideas' ? 'active' : '' %>">Ideas</a></li>
+      <li><a href="/contents" class="<%= active === 'contents' ? 'active' : '' %>">Contents</a></li>
+      <li><a href="/competitors" class="<%= active === 'competitors' ? 'active' : '' %>">Competitors</a></li>
+    </ul>
+  </nav>
+
+  <main class="container" style="padding-top:40px;padding-bottom:96px">
+    <%- body %>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.innerHTML = `<div class="toast-item toast-${type}">${msg}</div>`;
+      setTimeout(() => t.innerHTML = '', 3500);
+    }
+
+    let selectedIds = new Set();
+    function toggleSelectAll(checked) {
+      document.querySelectorAll('.idea-checkbox').forEach(cb => { cb.checked = checked; updateSelection(cb.value, checked); });
+    }
+    function updateSelection(id, checked) { checked ? selectedIds.add(id) : selectedIds.delete(id); updateBulkBtn(); }
+    function updateBulkBtn() {
+      const btn = document.getElementById('bulk-approve-btn');
+      if (btn) { btn.textContent = `Approve (${selectedIds.size})`; btn.disabled = selectedIds.size === 0; }
+    }
+    async function bulkApprove() {
+      if (selectedIds.size === 0) return;
+      const res = await fetch('/api/ideas/approve-bulk', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ids:[...selectedIds]})
+      });
+      const d = await res.json();
+      if (d.success) { showToast(`${d.approved} ideas approved!`); selectedIds.clear(); setTimeout(()=>location.reload(),1000); }
+    }
+    async function approveIdea(id) {
+      await fetch(`/api/ideas/${id}/approve`,{method:'PATCH'});
+      showToast('Approved! Content production started.'); setTimeout(()=>location.reload(),800);
+    }
+    async function rejectIdea(id) {
+      await fetch(`/api/ideas/${id}/reject`,{method:'PATCH'});
+      showToast('Idea rejected.'); setTimeout(()=>location.reload(),800);
+    }
+    async function triggerScrape() {
+      const platforms = [...document.querySelectorAll('input[name="platforms"]:checked')].map(e=>e.value);
+      if (!platforms.length) { showToast('Select a platform','error'); return; }
+      const res = await fetch('/api/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({platforms})});
+      const d = await res.json();
+      if (d.success) { showToast('Scrape started!'); setTimeout(()=>location.href='/sources',1200); }
+    }
+    async function runTrendAnalysis() {
+      const btn = event.target; btn.disabled = true; btn.textContent = 'Analyzing...';
+      const res = await fetch('/api/trends'); const d = await res.json();
+      btn.disabled = false; btn.textContent = '📈 Trend Analysis';
+      showToast(d.topics ? `Analyzed ${d.topics.length} topics` : (d.message||'Done'));
+    }
+  </script>
+</body>
+</html>

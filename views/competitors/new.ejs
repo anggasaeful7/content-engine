@@ -1,0 +1,53 @@
+<div class="max-w-lg mx-auto">
+  <h1>Add Competitor</h1>
+
+  <div class="card mt-6">
+    <div class="card-body">
+      <form onsubmit="event.preventDefault();addCompetitor()">
+        <div class="form-group">
+          <label class="form-label" for="comp-name">Name</label>
+          <input type="text" id="comp-name" class="input" placeholder="e.g. Creativemedia" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="comp-platform">Platform</label>
+          <select id="comp-platform" class="select" required>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram">Instagram</option>
+            <option value="youtube">YouTube</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="comp-handle">Handle / Username</label>
+          <input type="text" id="comp-handle" class="input" placeholder="@username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="comp-url">Profile URL</label>
+          <input type="url" id="comp-url" class="input" placeholder="https://..." required>
+        </div>
+        <button type="submit" class="btn btn-primary w-full mt-4">Add & Analyze</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+async function addCompetitor() {
+  const data = {
+    name: document.getElementById('comp-name').value,
+    platform: document.getElementById('comp-platform').value,
+    handle: document.getElementById('comp-handle').value,
+    profileUrl: document.getElementById('comp-url').value,
+  };
+  const res = await fetch('/api/competitors', {
+    method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)
+  });
+  const comp = await res.json();
+  if (comp.id) {
+    await fetch(`/api/competitors/${comp.id}/analyze`,{method:'POST'});
+    showToast('Competitor added & analyzing...');
+    setTimeout(()=>location.href='/competitors',1500);
+  } else {
+    showToast('Failed','error');
+  }
+}
+</script>

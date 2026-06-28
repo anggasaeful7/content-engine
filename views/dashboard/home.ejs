@@ -1,0 +1,69 @@
+<!-- Stat Cards -->
+<div class="grid grid-4 mb-6">
+  <div class="card stat-card" hx-get="/api/analytics/dashboard" hx-trigger="load" hx-swap="innerHTML">
+    <div class="spinner"></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-value" id="trend-count">—</div>
+    <div class="stat-label">Trending Topics</div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-value" id="comp-count">—</div>
+    <div class="stat-label">Competitors</div>
+  </div>
+  <div class="card stat-card" hx-get="/api/trends/insights" hx-trigger="load" hx-swap="innerHTML">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card mb-6">
+  <div class="card-body">
+    <h2 style="font-size:18px">Quick Actions</h2>
+    <div class="flex gap-3 flex-wrap mt-4">
+      <a href="/sources/new" class="btn btn-primary">🔍 New Scrape</a>
+      <a href="/ideas" class="btn btn-secondary">💡 Review Ideas</a>
+      <a href="/contents" class="btn btn-secondary">📦 Contents</a>
+      <button class="btn btn-secondary" onclick="runTrendAnalysis()">📈 Trend Analysis</button>
+    </div>
+  </div>
+</div>
+
+<!-- Monetization Features -->
+<div class="grid grid-3 mb-6">
+  <div class="feature-card feature-purple">
+    <h3>🔄 Repurpose Chain</h3>
+    <p>1 ide → 5 platform otomatis. Setiap konten langsung diadaptasi ke X, LinkedIn, YouTube, Instagram, Newsletter.</p>
+    <a href="/contents" class="btn btn-ghost" style="color:#fff;margin-top:16px">Lihat Adaptasi →</a>
+  </div>
+  <div class="feature-card feature-orange">
+    <h3>📈 Trend Prediction</h3>
+    <p>AI analisis velocity hashtag. Prediksi topik viral minggu depan berdasarkan data historis.</p>
+    <button class="btn btn-ghost" style="color:#fff;margin-top:16px" onclick="runTrendAnalysis()">Analisis →</button>
+  </div>
+  <div class="feature-card feature-blue">
+    <h3>🕵️ Competitor Intel</h3>
+    <p>Track kompetitor, reverse-engineer strategi. AI deteksi pola sukses + kelemahan.</p>
+    <a href="/competitors" class="btn btn-ghost" style="color:#fff;margin-top:16px">Track →</a>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="grid grid-2">
+  <div class="card" style="max-height:400px;overflow-y:auto">
+    <div class="card-body">
+      <h2>Recent Sources</h2>
+      <div hx-get="/api/sources" hx-trigger="load, every 30s" hx-swap="innerHTML">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="max-height:400px;overflow-y:auto">
+    <div class="card-body">
+      <h2>Pipeline Status</h2>
+      <div hx-get="/api/analytics/dashboard" hx-trigger="load, every 30s" hx-swap="innerHTML">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+</div>

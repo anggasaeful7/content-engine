@@ -1,0 +1,39 @@
+<% if (typeof ideas !== 'undefined' && ideas.length > 0) { %>
+  <% ideas.forEach(idea => { %>
+  <tr class="<%= idea.status === 'approved' ? 'bg-success' : '' %>">
+    <td>
+      <% if (idea.status === 'pending') { %>
+      <input type="checkbox" class="checkbox idea-checkbox" value="<%= idea.id %>" onchange="updateSelection('<%= idea.id %>', this.checked)">
+      <% } %>
+    </td>
+    <td>
+      <div class="font-semibold" style="color:var(--text-heading)"><%= idea.title %></div>
+      <% if (idea.deepseekReasoning) { %>
+      <div class="text-xs text-subtle mt-1 max-w-md">💡 <%= (idea.deepseekReasoning || '').slice(0, 130) %><%= (idea.deepseekReasoning || '').length > 130 ? '...' : '' %></div>
+      <% } %>
+    </td>
+    <td><span class="badge badge-neutral"><%= idea.contentType %></span></td>
+    <td><span class="badge badge-brand"><%= idea.targetPlatform || idea.source?.platform %></span></td>
+    <td>
+      <div class="radial-progress" style="--p:<%= idea.qualityScore %>"><%= idea.qualityScore %></div>
+    </td>
+    <td>
+      <% if (idea.status === 'pending') { %><span class="badge badge-warning">pending</span>
+      <% } else if (idea.status === 'approved') { %><span class="badge badge-success">approved</span>
+      <% } else { %><span class="badge badge-danger">rejected</span><% } %>
+    </td>
+    <td>
+      <div class="flex gap-2">
+        <% if (idea.status === 'pending') { %>
+        <button class="btn btn-success btn-xs" onclick="approveIdea(<%= idea.id %>)">Approve</button>
+        <button class="btn btn-danger btn-xs" onclick="rejectIdea(<%= idea.id %>)">Reject</button>
+        <% } else if (idea.status === 'approved') { %>
+        <a href="/contents/<%= idea.id %>" class="btn btn-secondary btn-xs">View</a>
+        <% } %>
+      </div>
+    </td>
+  </tr>
+  <% }) %>
+<% } else { %>
+  <tr><td colspan="7" class="text-center py-8 text-subtle">No ideas yet. Start a scrape to generate content ideas.</td></tr>
+<% } %>

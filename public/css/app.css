@@ -1,0 +1,13 @@
+/* Angscode v2 Styles */
+.radial-progress { display: inline-flex; align-items: center; justify-content: center; }
+.toast { position: fixed; bottom: 1rem; right: 1rem; }
+.skeleton { animation: pulse 2s infinite; background: var(--fallback-bc, #e5e7eb); border-radius: 0.5rem; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Table hover */
+.table tr.hover:hover { background-color: hsl(var(--b2)); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar .menu-horizontal { display: none; }
+}

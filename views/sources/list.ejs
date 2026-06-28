@@ -1,0 +1,15 @@
+<div class="flex items-center justify-between mb-6">
+  <h1>Sources</h1>
+  <a href="/sources/new" class="btn btn-primary">New Scrape</a>
+</div>
+
+<div class="table-wrap">
+  <table hx-get="/api/sources" hx-trigger="load, every 15s" hx-swap="innerHTML">
+    <thead>
+      <tr><th>ID</th><th>Platform</th><th>Items</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="6" class="text-center py-8"><div class="spinner"></div></td></tr>
+    </tbody>
+  </table>
+</div>

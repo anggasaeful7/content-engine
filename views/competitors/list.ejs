@@ -1,0 +1,15 @@
+<div class="flex items-center justify-between mb-6">
+  <h1>🕵️ Competitor Intelligence</h1>
+  <a href="/competitors/new" class="btn btn-primary">Add Competitor</a>
+</div>
+
+<div class="table-wrap">
+  <table hx-get="/api/competitors" hx-trigger="load, every 30s" hx-swap="innerHTML">
+    <thead>
+      <tr><th>Name</th><th>Platform</th><th>Handle</th><th>Last Analysis</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="5" class="text-center py-8"><div class="spinner"></div></td></tr>
+    </tbody>
+  </table>
+</div>
